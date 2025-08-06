@@ -1,7 +1,3 @@
-variable "n01736553" {
-  type = string
-}
-
 variable "resource_group" {
   type = string
 }
@@ -11,6 +7,10 @@ variable "location" {
 }
 
 variable "subnet_id" {
+  type = string
+}
+
+variable "n01736553" {
   type = string
 }
 
