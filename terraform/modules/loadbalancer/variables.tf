@@ -6,7 +6,7 @@ variable "location" {
   type = string
 }
 
-variable "n01736553" {
+variable "humber_id" {
   type = string
 }
 
