@@ -18,7 +18,7 @@ module "vms" {
   resource_group = azurerm_resource_group.rg.name
   location       = var.location
   subnet_id      = module.network.subnet_id
-  humber_id      = "6553"
+  n01736553      = "6553"
   tags           = {
     environment = "dev"
     project     = "CCGC5502"

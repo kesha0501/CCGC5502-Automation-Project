@@ -1,6 +1,6 @@
 resource "azurerm_network_interface" "nic" {
   count               = 3
-  name                = "${var.humber_id}-nic${count.index + 1}"
+  name                = "${var.n01736553}-nic${count.index + 1}"
   location            = var.location
   resource_group_name = var.resource_group
   tags                = var.tags
@@ -15,7 +15,7 @@ resource "azurerm_network_interface" "nic" {
 
 resource "azurerm_public_ip" "pip" {
   count               = 3
-  name                = "${var.humber_id}-pip${count.index + 1}"
+  name                = "${var.n01736553}-pip${count.index + 1}"
   location            = var.location
   resource_group_name = var.resource_group
   allocation_method   = "Static"
@@ -25,7 +25,7 @@ resource "azurerm_public_ip" "pip" {
 
 resource "azurerm_managed_disk" "data_disk" {
   count               = 3
-  name                = "${var.humber_id}-vm${count.index + 1}-datadisk"
+  name                = "${var.n01736553}-vm${count.index + 1}-datadisk"
   location            = var.location
   resource_group_name = var.resource_group
   storage_account_type = "Standard_LRS"
@@ -36,7 +36,7 @@ resource "azurerm_managed_disk" "data_disk" {
 
 resource "azurerm_linux_virtual_machine" "vm" {
   count               = 3
-  name                = "${var.humber_id}-vm${count.index + 1}"
+  name                = "${var.n01736553}-vm${count.index + 1}"
   location            = var.location
   resource_group_name = var.resource_group
   size                = "Standard_B1ms"
