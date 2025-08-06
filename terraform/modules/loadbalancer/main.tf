@@ -45,3 +45,10 @@ resource "azurerm_lb_rule" "rule" {
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
   probe_id                       = azurerm_lb_probe.probe.id
 }
+resource "azurerm_network_interface_backend_address_pool_association" "nic_pool" {
+  count                   = length(var.vm_nic_ids)
+  network_interface_id    = var.vm_nic_ids[count.index]
+  ip_configuration_name   = "internal"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.backend.id
+  depends_on              = [var.vm_nic_ids]
+}

@@ -23,10 +23,15 @@ module "vms" {
 }
 
 module "loadbalancer" {
-  source              = "./modules/loadbalancer"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = var.location
-  vm_nic_ids          = module.vms.nic_ids
+  source         = "./modules/loadbalancer"
+  resource_group = azurerm_resource_group.rg.name
+  location       = var.location
+  humber_id      = "6553"
+  tags           = {
+    environment = "dev"
+    project     = "CCGC5502"
+  }
+  vm_nic_ids     = module.vms.nic_ids
 }
 
 output "vm_public_ips" {
