@@ -3,7 +3,6 @@ resource "azurerm_resource_group" "main" {
   location = var.location
   tags     = var.tags
 }
-
 module "networking" {
   source         = "./modules/networking"
   humber_id      = var.humber_id
@@ -11,7 +10,6 @@ module "networking" {
   location       = var.location
   tags           = var.tags
 }
-
 module "vms" {
   source         = "./modules/vms"
   humber_id      = var.humber_id
@@ -20,7 +18,6 @@ module "vms" {
   subnet_id      = module.networking.subnet_id
   tags           = var.tags
 }
-
 module "loadbalancer" {
   source         = "./modules/loadbalancer"
   humber_id      = var.humber_id
@@ -29,10 +26,13 @@ module "loadbalancer" {
   vm_nic_ids     = module.vms.nic_ids
   tags           = var.tags
 }
-
+module "network" {
+  source              = "./modules/network"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
+}
 resource "null_resource" "ansible_provisioner" {
   depends_on = [module.vms, module.loadbalancer]
-
   provisioner "local-exec" {
     command = <<-EOT
       ansible-playbook -i ${path.module}/ansible/inventory.yml ${path.module}/ansible/6553-playbook.yml
