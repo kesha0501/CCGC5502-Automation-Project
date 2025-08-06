@@ -1,0 +1,9 @@
+---
+- name: Configure Linux VMs
+  hosts: linux_vms
+  become: yes
+  roles:
+    - profile-6553
+    - user-6553
+    - datadisk-6553
+    - webserver-6553

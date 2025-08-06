@@ -1,0 +1,6 @@
+---
+- name: Append lines to /etc/profile
+  ansible.builtin.blockinfile:
+    path: /etc/profile
+    block: "{{ lookup('template', 'profile.j2') }}"
+    marker: "# {mark} Test block added by Ansible. {{ ansible_user }}"

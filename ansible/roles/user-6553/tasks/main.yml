@@ -1,0 +1,24 @@
+---
+- name: Create cloudadmins group
+  ansible.builtin.group:
+    name: cloudadmins
+    state: present
+
+- name: Create users and add to groups
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    groups: "{{ groups | join(',') }}"
+    append: yes
+    create_home: yes
+    generate_ssh_key: yes
+    ssh_key_type: rsa
+    ssh_key_file: .ssh/id_rsa
+    state: present
+  loop: "{{ users }}"
+
+- name: Fetch user100 private key to automation server
+  ansible.builtin.fetch:
+    src: /home/user100/.ssh/id_rsa
+    dest: ../keys/user100_id_rsa
+    flat: yes
+  when: inventory_hostname == 'vm1'
