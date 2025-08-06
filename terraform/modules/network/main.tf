@@ -41,3 +41,7 @@ resource "azurerm_network_security_group" "nsg" {
     destination_address_prefix = "*"
   }
 }
+
+output "subnet_id" {
+  value = azurerm_subnet.subnet.id
+}

@@ -1,41 +1,38 @@
-resource "azurerm_resource_group" "main" {
-  name     = var.resource_group_name
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "rg" {
+  name     = "rg-6553"
   location = var.location
-  tags     = var.tags
 }
-module "networking" {
-  source         = "./modules/networking"
-  humber_id      = var.humber_id
-  resource_group = azurerm_resource_group.main.name
-  location       = var.location
-  tags           = var.tags
-}
-module "vms" {
-  source         = "./modules/vms"
-  humber_id      = var.humber_id
-  resource_group = azurerm_resource_group.main.name
-  location       = var.location
-  subnet_id      = module.networking.subnet_id
-  tags           = var.tags
-}
-module "loadbalancer" {
-  source         = "./modules/loadbalancer"
-  humber_id      = var.humber_id
-  resource_group = azurerm_resource_group.main.name
-  location       = var.location
-  vm_nic_ids     = module.vms.nic_ids
-  tags           = var.tags
-}
+
 module "network" {
   source              = "./modules/network"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
 }
-resource "null_resource" "ansible_provisioner" {
-  depends_on = [module.vms, module.loadbalancer]
-  provisioner "local-exec" {
-    command = <<-EOT
-      ansible-playbook -i ${path.module}/ansible/inventory.yml ${path.module}/ansible/6553-playbook.yml
-    EOT
-  }
+
+module "vms" {
+  source              = "./modules/vms"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
+  subnet_id           = module.network.subnet_id
+  admin_username      = "adminuser"
+  ssh_public_key      = file("~/.ssh/id_rsa.pub")
+}
+
+module "loadbalancer" {
+  source              = "./modules/loadbalancer"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
+  vm_nic_ids          = module.vms.nic_ids
+}
+
+output "vm_public_ips" {
+  value = module.vms.public_ips
+}
+
+output "load_balancer_fqdn" {
+  value = module.loadbalancer.lb_fqdn
 }
