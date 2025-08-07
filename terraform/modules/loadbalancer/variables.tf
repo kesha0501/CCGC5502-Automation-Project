@@ -1,4 +1,4 @@
-variable "resource_group" {
+variable "humber_id" {
   type = string
 }
 
@@ -6,7 +6,7 @@ variable "location" {
   type = string
 }
 
-variable "humber_id" {
+variable "resource_group" {
   type = string
 }
 
