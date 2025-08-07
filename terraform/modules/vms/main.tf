@@ -113,7 +113,15 @@ resource "azurerm_virtual_machine_extension" "monitoring" {
             "performanceCounterConfiguration": [
               {
                 "counterSpecifier": "/builtin/Processor/PercentProcessorTime",
-                "sampleRate": "PT60S"
+                "sampleRate": "PT60S",
+                "unit": "Percent",
+                "annotation": []
+              },
+              {
+                "counterSpecifier": "/builtin/Memory/AvailableMemory",
+                "sampleRate": "PT60S",
+                "unit": "Bytes",
+                "annotation": []
               }
             ]
           }
