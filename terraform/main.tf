@@ -31,10 +31,6 @@ resource "azurerm_monitor_diagnostic_setting" "vm_diagnostics" {
   target_resource_id         = module.vms.vm_ids[0]
   storage_account_id         = azurerm_storage_account.diagnostics.id
 
-  enabled_log {
-    category = "VMInsightsPerf"
-  }
-
   metric {
     category = "AllMetrics"
     enabled  = true
