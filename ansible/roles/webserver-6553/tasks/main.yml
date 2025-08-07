@@ -31,9 +31,11 @@
     state: present
     groups: sudo
     append: true
+  register: user_result
 
 - name: Set up SSH key for user100
   ansible.builtin.authorized_key:
     user: user100
     state: present
     key: "{{ lookup('file', '/home/n01736553/.ssh/user100_id_rsa.pub') }}"
+  when: user_result is changed or ansible_check_mode == false
