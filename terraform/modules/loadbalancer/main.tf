@@ -44,14 +44,13 @@ resource "azurerm_lb_rule" "rule" {
   probe_id                       = azurerm_lb_probe.probe.id
 }
 
-# Temporarily commented out to bypass Invalid count argument error
-#resource "azurerm_network_interface_backend_address_pool_association" "nic_pool" {
- # count                   = length(var.vm_nic_ids)
-  #network_interface_id    = var.vm_nic_ids[count.index]
-  #ip_configuration_name   = "internal"
-  #backend_address_pool_id = azurerm_lb_backend_address_pool.backend.id
-  #depends_on              = [var.vm_nic_ids]
-#}
+resource "azurerm_network_interface_backend_address_pool_association" "nic_pool" {
+  count                   = length(var.vm_nic_ids)
+  network_interface_id    = var.vm_nic_ids[count.index]
+  ip_configuration_name   = "internal"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.backend.id
+  depends_on              = [var.vm_nic_ids]
+}
 
 output "lb_fqdn" {
   value = azurerm_public_ip.lb_ip.fqdn
