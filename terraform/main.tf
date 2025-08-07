@@ -40,6 +40,27 @@ resource "azurerm_monitor_diagnostic_setting" "vm_diagnostics" {
   }
 }
 
+resource "azurerm_availability_set" "avset" {
+  name                        = "${var.humber_id}-avset"
+  location                    = var.location
+  resource_group_name         = azurerm_resource_group.main.name
+  platform_fault_domain_count = 2
+  tags                        = var.tags
+}
+
+resource "azurerm_route_table" "route_table" {
+  name                          = "${var.humber_id}-route-table"
+  location                      = var.location
+  resource_group_name           = azurerm_resource_group.main.name
+  tags                          = var.tags
+
+  route {
+    name                   = "default"
+    address_prefix         = "0.0.0.0/0"
+    next_hop_type          = "Internet"
+  }
+}
+
 module "networking" {
   source         = "./modules/networking"
   humber_id      = var.humber_id
@@ -55,6 +76,7 @@ module "vms" {
   location       = var.location
   tags           = var.tags
   subnet_id      = module.networking.subnet_id
+  availability_set_id = azurerm_availability_set.avset.id
 }
 
 module "loadbalancer" {

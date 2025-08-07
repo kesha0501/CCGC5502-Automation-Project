@@ -34,6 +34,12 @@ resource "azurerm_managed_disk" "data_disk" {
   tags                 = var.tags
 }
 
+variable "availability_set_id" {
+  type        = string
+  description = "ID of the availability set"
+}
+
+
 resource "azurerm_linux_virtual_machine" "vm" {
   count               = 3
   name                = "${var.humber_id}-vm${count.index + 1}"
@@ -44,6 +50,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   network_interface_ids = [
     azurerm_network_interface.nic[count.index].id
   ]
+  availability_set_id = var.availability_set_id
   tags                = var.tags
 
   admin_ssh_key {
