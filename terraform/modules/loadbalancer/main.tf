@@ -4,6 +4,7 @@ resource "azurerm_public_ip" "lb_ip" {
   resource_group_name = var.resource_group
   allocation_method   = "Static"
   sku                 = "Standard"
+  domain_name_label   = "lb${var.humber_id}"
   tags                = var.tags
 }
 
