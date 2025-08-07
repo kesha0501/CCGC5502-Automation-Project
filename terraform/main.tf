@@ -1,39 +1,32 @@
-provider "azurerm" {
-  features {}
-}
-
 resource "azurerm_resource_group" "main" {
   name     = "rg-6553"
   location = var.location
+  tags     = var.tags
 }
 
 module "networking" {
-  source              = "./modules/networking"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = var.location
+  source         = "./modules/networking"
+  humber_id      = var.humber_id
+  resource_group = azurerm_resource_group.main.name
+  location       = var.location
+  tags           = var.tags
 }
 
 module "vms" {
   source         = "./modules/vms"
+  humber_id      = var.humber_id
   resource_group = azurerm_resource_group.main.name
   location       = var.location
+  tags           = var.tags
   subnet_id      = module.networking.subnet_id
-  n01736553      = "6553"
-  tags           = {
-    environment = "dev"
-    project     = "CCGC5502"
-  }
 }
 
 module "loadbalancer" {
   source         = "./modules/loadbalancer"
+  humber_id      = var.humber_id
   resource_group = azurerm_resource_group.main.name
   location       = var.location
-  humber_id      = "6553"
-  tags           = {
-    environment = "dev"
-    project     = "CCGC5502"
-  }
+  tags           = var.tags
   vm_nic_ids     = module.vms.nic_ids
 }
 
