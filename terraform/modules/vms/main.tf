@@ -101,12 +101,40 @@ resource "azurerm_virtual_machine_extension" "monitoring" {
   publisher            = "Microsoft.Azure.Diagnostics"
   type                 = "LinuxDiagnostic"
   type_handler_version = "3.0"
+  auto_upgrade_minor_version = true
   settings             = <<SETTINGS
     {
-      "StorageAccount": "${var.humber_id}-diagnostics"
+      "StorageAccount": "${var.humber_id}-diagnostics",
+      "ladCfg": {
+        "diagnosticMonitorConfiguration": {
+          "eventVolume": "Medium",
+          "metrics": {
+            "metricAggregation": [
+              {
+                "scheduledTransferPeriod": "PT1M"
+              }
+            ]
+          },
+          "performanceCounters": {
+            "performanceCounterConfiguration": [
+              {
+                "counterSpecifier": "/builtin/Processor/PercentProcessorTime",
+                "sampleRate": "PT60S"
+              }
+            ]
+          }
+        }
+      }
     }
   SETTINGS
+  protected_settings    = <<PROTECTED_SETTINGS
+    {
+      "storageAccountName": "${var.humber_id}-diagnostics",
+      "storageAccountKey": "${azurerm_storage_account.diagnostics.primary_access_key}"
+    }
+  PROTECTED_SETTINGS
   tags                 = var.tags
+  depends_on           = [azurerm_storage_account.diagnostics]
 }
 
 output "public_ips" {

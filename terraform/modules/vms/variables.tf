@@ -23,3 +23,13 @@ variable "subnet_id" {
   type        = string
   description = "ID of the subnet"
 }
+
+variable "availability_set_id" {
+  type        = string
+  description = "ID of the availability set"
+}
+
+variable "storage_account_id" {
+  type        = string
+  description = "ID of the storage account for diagnostics"
+}

@@ -30,10 +30,11 @@ resource "azurerm_monitor_diagnostic_setting" "vm_diagnostics" {
   name                       = "${var.humber_id}-vm-diagnostics"
   target_resource_id         = module.vms.vm_ids[0]
   storage_account_id         = azurerm_storage_account.diagnostics.id
-  log {
-    category = "AuditEvent"
-    enabled  = true
+
+  enabled_log {
+    category = "VMInsightsPerf"
   }
+
   metric {
     category = "AllMetrics"
     enabled  = true
@@ -77,6 +78,7 @@ module "vms" {
   tags           = var.tags
   subnet_id      = module.networking.subnet_id
   availability_set_id = azurerm_availability_set.avset.id
+  storage_account_id  = azurerm_storage_account.diagnostics.id
 }
 
 module "loadbalancer" {
