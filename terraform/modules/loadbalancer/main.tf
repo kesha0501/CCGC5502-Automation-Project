@@ -72,7 +72,7 @@ resource "azurerm_lb_nat_rule" "ssh" {
   frontend_port                  = 2200 + count.index
   backend_port                   = 22
   frontend_ip_configuration_name = "PublicIPAddress"
-  backend_ip_configuration_id    = var.vm_nic_ids[count.index]
+  backend_address_pool_id        = azurerm_lb_backend_address_pool.backend.id
 }
 
 output "lb_fqdn" {
