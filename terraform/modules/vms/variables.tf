@@ -33,3 +33,9 @@ variable "storage_account_id" {
   type        = string
   description = "ID of the storage account for diagnostics"
 }
+
+variable "storage_account_key" {
+  type        = string
+  description = "Primary access key for the storage account"
+  sensitive   = true
+}

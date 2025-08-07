@@ -34,12 +34,6 @@ resource "azurerm_managed_disk" "data_disk" {
   tags                 = var.tags
 }
 
-variable "availability_set_id" {
-  type        = string
-  description = "ID of the availability set"
-}
-
-
 resource "azurerm_linux_virtual_machine" "vm" {
   count               = 3
   name                = "${var.humber_id}-vm${count.index + 1}"
@@ -130,11 +124,10 @@ resource "azurerm_virtual_machine_extension" "monitoring" {
   protected_settings    = <<PROTECTED_SETTINGS
     {
       "storageAccountName": "${var.humber_id}-diagnostics",
-      "storageAccountKey": "${azurerm_storage_account.diagnostics.primary_access_key}"
+      "storageAccountKey": "${var.storage_account_key}"
     }
   PROTECTED_SETTINGS
   tags                 = var.tags
-  depends_on           = [azurerm_storage_account.diagnostics]
 }
 
 output "public_ips" {

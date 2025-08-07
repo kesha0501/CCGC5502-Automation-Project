@@ -79,6 +79,7 @@ module "vms" {
   subnet_id      = module.networking.subnet_id
   availability_set_id = azurerm_availability_set.avset.id
   storage_account_id  = azurerm_storage_account.diagnostics.id
+  storage_account_key = azurerm_storage_account.diagnostics.primary_access_key
 }
 
 module "loadbalancer" {
