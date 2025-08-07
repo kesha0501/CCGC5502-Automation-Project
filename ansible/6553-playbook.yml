@@ -1,9 +1,14 @@
 ---
-- name: Configure Linux VMs
+- name: Configure web servers
   hosts: linux_vms
   become: yes
+  vars:
+    web_files:
+      vm1:
+        file: vm1_index.html
+      vm2:
+        file: vm2_index.html
+      vm3:
+        file: vm3_index.html
   roles:
-    - profile-6553
-    - user-6553
-    - datadisk-6553
     - webserver-6553
