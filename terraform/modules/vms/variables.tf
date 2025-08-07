@@ -44,3 +44,9 @@ variable "workspace_id" {
   type        = string
   description = "ID of the Log Analytics Workspace"
 }
+
+variable "workspace_key" {
+  type        = string
+  description = "Primary shared key for the Log Analytics Workspace"
+  sensitive   = true
+}

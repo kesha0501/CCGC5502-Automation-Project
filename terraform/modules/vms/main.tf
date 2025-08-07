@@ -103,7 +103,7 @@ resource "azurerm_virtual_machine_extension" "monitoring" {
   SETTINGS
   protected_settings    = <<PROTECTED_SETTINGS
     {
-      "workspaceKey": "${azurerm_log_analytics_workspace.workspace.primary_shared_key}"
+      "workspaceKey": "${var.workspace_key}"
     }
   PROTECTED_SETTINGS
   tags                 = var.tags
@@ -120,3 +120,4 @@ output "nic_ids" {
 output "vm_ids" {
   value = azurerm_linux_virtual_machine.vm[*].id
 }
+

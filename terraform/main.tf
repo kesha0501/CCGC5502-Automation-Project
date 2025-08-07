@@ -87,6 +87,7 @@ module "vms" {
   storage_account_id  = azurerm_storage_account.diagnostics.id
   storage_account_key = azurerm_storage_account.diagnostics.primary_access_key
   workspace_id        = azurerm_log_analytics_workspace.workspace.id
+  workspace_key       = azurerm_log_analytics_workspace.workspace.primary_shared_key
 }
 
 module "loadbalancer" {
