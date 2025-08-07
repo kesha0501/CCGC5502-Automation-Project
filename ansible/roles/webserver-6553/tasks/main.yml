@@ -38,4 +38,4 @@
     user: user100
     state: present
     key: "{{ lookup('file', '/home/n01736553/.ssh/user100_id_rsa.pub') }}"
-  when: user_result is changed or ansible_check_mode == false
+  when: not ansible_check_mode
