@@ -26,10 +26,20 @@ resource "azurerm_storage_account" "diagnostics" {
   tags                     = var.tags
 }
 
+resource "azurerm_log_analytics_workspace" "workspace" {
+  name                = "${var.humber_id}-workspace"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+  tags                = var.tags
+}
+
 resource "azurerm_monitor_diagnostic_setting" "vm_diagnostics" {
   name                       = "${var.humber_id}-vm-diagnostics"
   target_resource_id         = module.vms.vm_ids[0]
   storage_account_id         = azurerm_storage_account.diagnostics.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.workspace.id
 
   metric {
     category = "AllMetrics"
@@ -67,15 +77,16 @@ module "networking" {
 }
 
 module "vms" {
-  source         = "./modules/vms"
-  humber_id      = var.humber_id
-  resource_group = azurerm_resource_group.main.name
-  location       = var.location
-  tags           = var.tags
-  subnet_id      = module.networking.subnet_id
+  source              = "./modules/vms"
+  humber_id           = var.humber_id
+  resource_group      = azurerm_resource_group.main.name
+  location            = var.location
+  tags                = var.tags
+  subnet_id           = module.networking.subnet_id
   availability_set_id = azurerm_availability_set.avset.id
   storage_account_id  = azurerm_storage_account.diagnostics.id
   storage_account_key = azurerm_storage_account.diagnostics.primary_access_key
+  workspace_id        = azurerm_log_analytics_workspace.workspace.id
 }
 
 module "loadbalancer" {

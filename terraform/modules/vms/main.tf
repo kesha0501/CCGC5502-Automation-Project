@@ -92,47 +92,18 @@ resource "azurerm_virtual_machine_extension" "monitoring" {
   count                = 3
   name                 = "${var.humber_id}-vm${count.index + 1}-monitoring"
   virtual_machine_id   = azurerm_linux_virtual_machine.vm[count.index].id
-  publisher            = "Microsoft.Azure.Diagnostics"
-  type                 = "LinuxDiagnostic"
-  type_handler_version = "3.0"
+  publisher            = "Microsoft.Azure.Monitor"
+  type                 = "AzureMonitorLinuxAgent"
+  type_handler_version = "1.0"
   auto_upgrade_minor_version = true
   settings             = <<SETTINGS
     {
-      "StorageAccount": "${var.humber_id}-diagnostics",
-      "ladCfg": {
-        "diagnosticMonitorConfiguration": {
-          "eventVolume": "Medium",
-          "metrics": {
-            "metricAggregation": [
-              {
-                "scheduledTransferPeriod": "PT1M"
-              }
-            ]
-          },
-          "performanceCounters": {
-            "performanceCounterConfiguration": [
-              {
-                "counterSpecifier": "/builtin/Processor/PercentProcessorTime",
-                "sampleRate": "PT60S",
-                "unit": "Percent",
-                "annotation": []
-              },
-              {
-                "counterSpecifier": "/builtin/Memory/AvailableMemory",
-                "sampleRate": "PT60S",
-                "unit": "Bytes",
-                "annotation": []
-              }
-            ]
-          }
-        }
-      }
+      "workspaceId": "${var.workspace_id}"
     }
   SETTINGS
   protected_settings    = <<PROTECTED_SETTINGS
     {
-      "storageAccountName": "${var.humber_id}-diagnostics",
-      "storageAccountKey": "${var.storage_account_key}"
+      "workspaceKey": "${azurerm_log_analytics_workspace.workspace.primary_shared_key}"
     }
   PROTECTED_SETTINGS
   tags                 = var.tags

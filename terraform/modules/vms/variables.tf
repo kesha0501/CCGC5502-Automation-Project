@@ -39,3 +39,8 @@ variable "storage_account_key" {
   description = "Primary access key for the storage account"
   sensitive   = true
 }
+
+variable "workspace_id" {
+  type        = string
+  description = "ID of the Log Analytics Workspace"
+}
