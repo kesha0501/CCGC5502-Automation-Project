@@ -88,27 +88,6 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
   tags                 = var.tags
 }
 
-resource "azurerm_virtual_machine_extension" "monitoring" {
-  count                = 3
-  name                 = "${var.humber_id}-vm${count.index + 1}-monitoring"
-  virtual_machine_id   = azurerm_linux_virtual_machine.vm[count.index].id
-  publisher            = "Microsoft.Azure.Monitor"
-  type                 = "AzureMonitorLinuxAgent"
-  type_handler_version = "1.0"
-  auto_upgrade_minor_version = true
-  settings             = <<SETTINGS
-    {
-      "workspaceId": "${var.workspace_id}"
-    }
-  SETTINGS
-  protected_settings    = <<PROTECTED_SETTINGS
-    {
-      "workspaceKey": "${var.workspace_key}"
-    }
-  PROTECTED_SETTINGS
-  tags                 = var.tags
-}
-
 output "public_ips" {
   value = azurerm_public_ip.pip[*].ip_address
 }
@@ -120,4 +99,3 @@ output "nic_ids" {
 output "vm_ids" {
   value = azurerm_linux_virtual_machine.vm[*].id
 }
-

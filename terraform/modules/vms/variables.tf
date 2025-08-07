@@ -28,25 +28,3 @@ variable "availability_set_id" {
   type        = string
   description = "ID of the availability set"
 }
-
-variable "storage_account_id" {
-  type        = string
-  description = "ID of the storage account for diagnostics"
-}
-
-variable "storage_account_key" {
-  type        = string
-  description = "Primary access key for the storage account"
-  sensitive   = true
-}
-
-variable "workspace_id" {
-  type        = string
-  description = "ID of the Log Analytics Workspace"
-}
-
-variable "workspace_key" {
-  type        = string
-  description = "Primary shared key for the Log Analytics Workspace"
-  sensitive   = true
-}
