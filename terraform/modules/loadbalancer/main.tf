@@ -69,7 +69,8 @@ resource "azurerm_lb_nat_rule" "ssh" {
   loadbalancer_id                = azurerm_lb.lb.id
   name                           = "${var.humber_id}-ssh-${count.index + 1}"
   protocol                       = "Tcp"
-  frontend_port                  = 2200 + count.index
+  frontend_port_start            = 2200 + count.index
+  frontend_port_end              = 2200 + count.index
   backend_port                   = 22
   frontend_ip_configuration_name = "PublicIPAddress"
   backend_address_pool_id        = azurerm_lb_backend_address_pool.backend.id
