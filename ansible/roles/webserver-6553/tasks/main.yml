@@ -1,7 +1,7 @@
 ---
 - name: Install Apache
   ansible.builtin.package:
-    name: apache2
+    name: httpd
     state: present
 
 - name: Copy index.html to respective VM
@@ -13,7 +13,7 @@
 
 - name: Ensure Apache is started and enabled
   ansible.builtin.service:
-    name: apache2
+    name: httpd
     state: started
     enabled: yes
 
