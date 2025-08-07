@@ -72,10 +72,44 @@ resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {
   caching            = "ReadWrite"
 }
 
+resource "azurerm_virtual_machine_extension" "custom_script" {
+  count                = 3
+  name                 = "${var.humber_id}-vm${count.index + 1}-custom-script"
+  virtual_machine_id   = azurerm_linux_virtual_machine.vm[count.index].id
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.0"
+  settings             = <<SETTINGS
+    {
+      "commandToExecute": "apt-get update && apt-get install -y apache2"
+    }
+  SETTINGS
+  tags                 = var.tags
+}
+
+resource "azurerm_virtual_machine_extension" "monitoring" {
+  count                = 3
+  name                 = "${var.humber_id}-vm${count.index + 1}-monitoring"
+  virtual_machine_id   = azurerm_linux_virtual_machine.vm[count.index].id
+  publisher            = "Microsoft.Azure.Diagnostics"
+  type                 = "LinuxDiagnostic"
+  type_handler_version = "3.0"
+  settings             = <<SETTINGS
+    {
+      "StorageAccount": "${var.humber_id}-diagnostics"
+    }
+  SETTINGS
+  tags                 = var.tags
+}
+
 output "public_ips" {
   value = azurerm_public_ip.pip[*].ip_address
 }
 
 output "nic_ids" {
   value = azurerm_network_interface.nic[*].id
+}
+
+output "vm_ids" {
+  value = azurerm_linux_virtual_machine.vm[*].id
 }
