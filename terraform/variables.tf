@@ -6,7 +6,7 @@ variable "humber_id" {
 
 variable "location" {
   type    = string
-  default = "CanadaCentral"
+  default = "canadacentral"
   description = "Azure region for resources"
 }
 
