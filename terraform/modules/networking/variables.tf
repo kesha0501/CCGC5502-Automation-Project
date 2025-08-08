@@ -1,20 +1,26 @@
-variable "humber_id" {
-  type    = string
-  description = "Humber ID for naming resources"
-}
-
-variable "resource_group" {
-  type    = string
+variable "resource_group_name" {
   description = "Name of the resource group"
+  type        = string
 }
 
 variable "location" {
-  type    = string
-  description = "Azure region for resources"
+  description = "Azure location"
+  type        = string
+}
+
+variable "project_prefix" {
+  description = "Project prefix for naming"
+  type        = string
+}
+
+variable "vm_count" {
+  description = "Number of VMs"
+  type        = number
+  default     = 3
 }
 
 variable "tags" {
-  type    = map(string)
-  description = "Tags for resources"
-  default = {}
+  description = "Tags to apply to resources"
+  type        = map(string)
+  default     = {}
 }

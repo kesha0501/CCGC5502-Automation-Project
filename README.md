@@ -1,24 +1,31 @@
 # CCGC 5502 Automation Project
+**Student**: Kesha Shah (6553)
 
-This repository contains the code for the CCGC 5502 Automation Project, implementing infrastructure as code with Terraform and configuration as code with Ansible on Microsoft Azure. Humber ID: n01736553.
+## Overview
+This project automates the deployment of 3 Azure VMs with a load balancer using Terraform and configures them with Ansible for CCGC 5502.
 
-## Directory Structure
-- `ansible/`: Ansible playbook, inventory, and roles.
-- `terraform/`: Terraform root and module files for Azure infrastructure.
-- `docs/`: Screenshots and videos for submission.
-- `keys/`: SSH keys fetched from VMs.
+## Terraform Setup
+- Initialize: `cd terraform && terraform init`
+- Apply: `terraform apply main.tfplan`
+- Outputs: `terraform output vm_public_ips`, `terraform output loadbalancer_public_ip`
+- Resources: 48 (verified via `terraform state list | nl`)
 
-## Setup
-1. Clone the repository: `git clone git@github.com:kesha0501/CCGC5502-Automation-Project.git`
-2. Install Terraform, Ansible, and Azure CLI.
-3. Authenticate with Azure: `az login`
-4. Create Azure storage account `6553tfstate` and container `tfstate`.
-5. Run `terraform init` and `terraform apply` in the `terraform/` directory.
-6. Update `ansible/inventory.yml` with VM IPs from Terraform outputs.
-7. Run the Ansible playbook: `ansible-playbook -i ansible/inventory.yml ansible/6553-playbook.yml`
+## Ansible Setup
+- Inventory: `ansible/inventory.yml` (VM public IPs: 4.206.74.73, 4.206.32.161, 4.206.32.113)
+- Playbook: `ansible/6553-playbook.yml`
+- Roles:
+  - `datadisk-6553`: Formats and mounts 10GB data disk at `/mnt/data`.
+  - `user-6553`: Creates `student` user with SSH key-based login.
+  - `profile-6553`: Sets environment variables in `/etc/profile.d/6553.sh`.
+  - `webserver-6553`: Installs Apache, serves unique HTML pages (`vm1.html`, `vm2.html`, `vm3.html`).
+- Run: `cd ansible && ansible-playbook -i inventory.yml 6553-playbook.yml`
 
-## Tags
-- Project: CCGC 5502 Automation Project
-- Name: Kesha Shah
-- ExpirationDate: 2024-12-31
-- Environment: Project
+## Validation
+- Disk: `ansible -i inventory.yml all -m shell -a "lsblk"` and `df -h /mnt/data`
+- User: `ansible -i inventory.yml all -m shell -a "id student"`; SSH key login (`ssh -i ../backup_ssh_keys/id_rsa student@<IP>`)
+- Profile: `ansible -i inventory.yml all -m shell -a "cat /etc/profile.d/6553.sh"` and `echo \$STUDENT_ID`
+- Web Server: `curl http://<loadbalancer_public_ip>`
+- Screenshots: `docs/screenshots/*.png`, `*.mp4`
+
+## Repository
+- GitHub: `git@github.com:kesha0501/CCGC5502-Automation-Project.git`

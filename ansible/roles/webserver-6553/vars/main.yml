@@ -1,5 +1,2 @@
 ---
-web_files:
-  vm1: { hostname: vm1, file: vm1.html }
-  vm2: { hostname: vm2, file: vm2.html }
-  vm3: { hostname: vm3, file: vm3.html }
+# No variables needed for now

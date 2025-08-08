@@ -1,41 +1,22 @@
 ---
 - name: Install Apache
-  ansible.builtin.package:
+  ansible.builtin.apt:
     name: apache2
     state: present
-    update_cache: true
+    update_cache: yes
+  become: yes
 
-- name: Copy index.html to respective VM
+- name: Copy HTML file for specific VM
   ansible.builtin.copy:
-    src: "{{ web_files[inventory_hostname].file }}"
+    src: "{{ inventory_hostname }}.html"
     dest: /var/www/html/index.html
-    mode: '0444'
+    mode: '0644'
+  become: yes
   notify: Restart Apache
 
-- name: Ensure Apache is started and enabled
+- name: Ensure Apache is running
   ansible.builtin.service:
     name: apache2
     state: started
-    enabled: true
-  register: service_result
-  retries: 3
-  delay: 5
-  until: service_result is not failed
-  failed_when: >
-    service_result is failed or
-    service_result.status.ActiveState != 'active'
-
-- name: Create user100
-  ansible.builtin.user:
-    name: user100
-    state: present
-    groups: sudo
-    append: true
-  register: user_result
-
-- name: Set up SSH key for user100
-  ansible.builtin.authorized_key:
-    user: user100
-    state: present
-    key: "{{ lookup('file', '/home/n01736553/.ssh/user100_id_rsa.pub') }}"
-  when: not ansible_check_mode
+    enabled: yes
+  become: yes

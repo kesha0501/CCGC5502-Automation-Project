@@ -1,81 +1,49 @@
-resource "azurerm_public_ip" "lb_ip" {
-  name                = "${var.humber_id}-lb-pip"
-  location            = var.location
-  resource_group_name = var.resource_group
-  allocation_method   = "Static"
-  sku                 = "Standard"
-  domain_name_label   = "lb${var.humber_id}"
-  tags                = var.tags
+data "azurerm_public_ip" "lb" {
+  name                = "pip-lb-${var.project_prefix}"
+  resource_group_name = var.resource_group_name
 }
 
-resource "azurerm_lb" "lb" {
-  name                = "${var.humber_id}-lb"
+resource "azurerm_lb" "main" {
+  name                = "lb-${var.project_prefix}"
   location            = var.location
-  resource_group_name = var.resource_group
+  resource_group_name = var.resource_group_name
   sku                 = "Standard"
-  tags                = var.tags
-
   frontend_ip_configuration {
     name                 = "PublicIPAddress"
-    public_ip_address_id = azurerm_public_ip.lb_ip.id
+    public_ip_address_id = var.lb_public_ip_id
   }
+  tags = var.tags
 }
 
-resource "azurerm_lb_backend_address_pool" "backend" {
-  loadbalancer_id = azurerm_lb.lb.id
-  name            = "${var.humber_id}-backend"
+resource "azurerm_lb_backend_address_pool" "main" {
+  loadbalancer_id = azurerm_lb.main.id
+  name            = "backend-pool-${var.project_prefix}"
 }
 
-resource "azurerm_network_interface_backend_address_pool_association" "nic_pool" {
-  count                   = 3
-  network_interface_id    = var.vm_nic_ids[count.index]
+resource "azurerm_network_interface_backend_address_pool_association" "main" {
+  count                   = var.vm_count
+  network_interface_id    = var.network_interface_ids[count.index]
   ip_configuration_name   = "internal"
-  backend_address_pool_id = azurerm_lb_backend_address_pool.backend.id
+  backend_address_pool_id = azurerm_lb_backend_address_pool.main.id
 }
 
-resource "azurerm_lb_probe" "probe" {
-  loadbalancer_id = azurerm_lb.lb.id
-  name            = "${var.humber_id}-probe"
-  protocol        = "Http"
-  port            = 80
-  request_path    = "/"
-}
-
-resource "azurerm_lb_rule" "rule" {
-  loadbalancer_id                = azurerm_lb.lb.id
-  name                           = "${var.humber_id}-rule"
+resource "azurerm_lb_rule" "main" {
+  loadbalancer_id                = azurerm_lb.main.id
+  name                           = "http-rule"
   protocol                       = "Tcp"
   frontend_port                  = 80
   backend_port                   = 80
   frontend_ip_configuration_name = "PublicIPAddress"
-  backend_address_pool_ids      = [azurerm_lb_backend_address_pool.backend.id]
-  probe_id                       = azurerm_lb_probe.probe.id
-}
-
-resource "azurerm_lb_rule" "https_rule" {
-  loadbalancer_id                = azurerm_lb.lb.id
-  name                           = "${var.humber_id}-https-rule"
-  protocol                       = "Tcp"
-  frontend_port                  = 443
-  backend_port                   = 443
-  frontend_ip_configuration_name = "PublicIPAddress"
-  backend_address_pool_ids      = [azurerm_lb_backend_address_pool.backend.id]
-  probe_id                       = azurerm_lb_probe.probe.id
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.main.id]
 }
 
 resource "azurerm_lb_nat_rule" "ssh" {
-  count                          = 3
-  resource_group_name            = var.resource_group
-  loadbalancer_id                = azurerm_lb.lb.id
-  name                           = "${var.humber_id}-ssh-${count.index + 1}"
+  count                          = var.vm_count
+  resource_group_name            = var.resource_group_name
+  loadbalancer_id                = azurerm_lb.main.id
+  name                           = "ssh-nat-${count.index + 1}"
   protocol                       = "Tcp"
-  frontend_port_start            = 2200 + count.index
-  frontend_port_end              = 2200 + count.index
+  frontend_port                  = 2200 + count.index
   backend_port                   = 22
   frontend_ip_configuration_name = "PublicIPAddress"
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.backend.id
-}
-
-output "lb_fqdn" {
-  value = azurerm_public_ip.lb_ip.fqdn
 }

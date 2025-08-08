@@ -1,6 +1,7 @@
 ---
-- name: Append lines to /etc/profile
-  ansible.builtin.blockinfile:
-    path: /etc/profile
-    block: "{{ lookup('template', 'profile.j2') }}"
-    marker: "# {mark} Test block added by Ansible. {{ ansible_user }}"
+- name: Copy profile script
+  ansible.builtin.template:
+    src: profile.j2
+    dest: /etc/profile.d/6553.sh
+    mode: '0644'
+  become: yes

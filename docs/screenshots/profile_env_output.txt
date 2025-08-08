@@ -1,0 +1,6 @@
+vm3 | FAILED | rc=127 >>
+/bin/sh: 1: source: not foundnon-zero return code
+vm1 | FAILED | rc=127 >>
+/bin/sh: 1: source: not foundnon-zero return code
+vm2 | FAILED | rc=127 >>
+/bin/sh: 1: source: not foundnon-zero return code

@@ -1,0 +1,9 @@
+vm1 | CHANGED | rc=0 >>
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdc1       9.8G   24K  9.3G   1% /mnt/data
+vm3 | CHANGED | rc=0 >>
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdc1       9.8G   24K  9.3G   1% /mnt/data
+vm2 | CHANGED | rc=0 >>
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdc1       9.8G   24K  9.3G   1% /mnt/data

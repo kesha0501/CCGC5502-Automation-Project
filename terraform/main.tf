@@ -1,68 +1,77 @@
-provider "azurerm" {
-  features {}
+locals {
+  common_tags = {
+    Project        = "CCGC 5502 Automation Project"
+    Name           = "Kesha.Shah"
+    ExpirationDate = "2024-12-31"
+    Environment    = "Project"
+  }
+  project_prefix = "6553"
+  vm_count      = 3
+  vm_size       = "Standard_B1ms"
+  location      = "canadacentral"
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "rg-${var.humber_id}"
-  location = var.location
-  tags     = var.tags
+variable "admin_username" {
+  description = "Administrator username for VMs"
+  type        = string
+  default     = "adminuser"
 }
 
-resource "azurerm_availability_set" "vm_as" {
-  name                = "${var.humber_id}-as"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
-  platform_fault_domain_count  = 2
-  platform_update_domain_count = 5
-  tags                = var.tags
+variable "ssh_public_key_path" {
+  description = "Path to SSH public key"
+  type        = string
+  default     = "~/.ssh/id_rsa.pub"
+}
+
+resource "azurerm_resource_group" "main" {
+  name     = "rg-${local.project_prefix}"
+  location = local.location
+  tags     = local.common_tags
 }
 
 module "networking" {
-  source         = "./modules/networking"
-  humber_id      = var.humber_id
-  location       = var.location
-  resource_group = azurerm_resource_group.rg.name
-  tags           = var.tags
+  source              = "./modules/networking"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  project_prefix      = local.project_prefix
+  vm_count            = local.vm_count
+  tags                = local.common_tags
 }
 
 module "vms" {
-  source             = "./modules/vms"
-  humber_id          = var.humber_id
-  location           = var.location
-  resource_group     = azurerm_resource_group.rg.name
-  subnet_id          = module.networking.subnet_id
-  availability_set_id = azurerm_availability_set.vm_as.id
-  tags               = var.tags
+  source              = "./modules/vms"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  project_prefix      = local.project_prefix
+  vm_count            = local.vm_count
+  vm_size             = local.vm_size
+  admin_username      = var.admin_username
+  ssh_public_key      = file(var.ssh_public_key_path)
+  subnet_ids          = module.networking.subnet_ids
+  nsg_ids             = module.networking.nsg_ids
+  public_ip_ids       = module.networking.public_ip_ids
+  tags                = local.common_tags
+  depends_on          = [module.networking]
 }
 
 module "loadbalancer" {
-  source         = "./modules/loadbalancer"
-  humber_id      = var.humber_id
-  location       = var.location
-  resource_group = azurerm_resource_group.rg.name
-  vm_nic_ids     = module.vms.nic_ids
-  tags           = var.tags
+  source              = "./modules/loadbalancer"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  project_prefix      = local.project_prefix
+  vm_count            = local.vm_count
+  network_interface_ids = module.vms.network_interface_ids
+  lb_public_ip_id     = module.networking.lb_public_ip_id
+  tags                = local.common_tags
+  depends_on          = [module.vms]
 }
-
-variable "humber_id" {
-  default = "6553"
-}
-
-variable "location" {
-  default = "canadacentral"
-}
-
-variable "tags" {
-  default = {
-    environment = "CCGC 5502 Automation Project"
-    owner       = "n01736553"
+	
+resource "null_resource" "ansible_provisioner" {
+  depends_on = [module.vms, module.loadbalancer]
+  provisioner "local-exec" {
+    command = "sleep 60 && ansible-playbook -i ../ansible/inventory.yml ../ansible/${local.project_prefix}-playbook.yml"
   }
-}
-
-output "load_balancer_fqdn" {
-  value = module.loadbalancer.lb_fqdn
-}
-
-output "vm_public_ips" {
-  value = module.vms.public_ips
+  triggers = {
+    vm_ids = join(",", module.vms.vm_ids)
+  }
 }
