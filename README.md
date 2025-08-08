@@ -23,7 +23,7 @@ This project automates the deployment of 3 Azure VMs with a load balancer using 
 ## Validation
 - Disk: `ansible -i inventory.yml all -m shell -a "lsblk"` and `df -h /mnt/data`
 - User: `ansible -i inventory.yml all -m shell -a "id student"`; SSH key login (`ssh -i ../backup_ssh_keys/id_rsa student@<IP>`)
-- Profile: `ansible -i inventory.yml all -m shell -a "cat /etc/profile.d/6553.sh"` and `echo \$STUDENT_ID`
+- Profile: `ansible -i inventory.yml all -m shell -a "cat /etc/profile.d/6553.sh"` and `. /etc/profile.d/6553.sh && echo $STUDENT_ID`
 - Web Server: `curl http://<loadbalancer_public_ip>`
 - Screenshots: `docs/screenshots/*.png`, `*.mp4`
 

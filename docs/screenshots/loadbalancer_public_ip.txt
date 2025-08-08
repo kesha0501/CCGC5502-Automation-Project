@@ -1,0 +1,1 @@
+/subscriptions/c42991b1-bb4a-4e0a-8e37-7ad275aa0d42/resourceGroups/rg-6553/providers/Microsoft.Network/publicIPAddresses/pip-lb-6553

@@ -4,8 +4,8 @@ output "resource_group_name" {
 }
 
 output "vm_public_ips" {
-  description = "Public IP addresses of VMs"
-  value       = module.vms.public_ip_addresses
+  description = "Public IPs of the VMs"
+  value       = module.networking.public_ip_ids[*]
 }
 
 output "vm_private_ips" {
@@ -39,4 +39,9 @@ output "ssh_connection_commands" {
 output "load_balancer_url" {
   description = "Load balancer HTTP URL"
   value       = "http://${module.loadbalancer.public_ip_address}"
+}
+
+output "loadbalancer_public_ip" {
+  description = "Public IP of the load balancer"
+  value       = module.networking.lb_public_ip_id
 }
