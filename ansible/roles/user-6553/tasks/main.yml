@@ -1,26 +1,28 @@
----
-- name: Create student user
-  ansible.builtin.user:
-    name: "{{ student_username }}"
-    password: "{{ student_password | password_hash('sha512') }}"
-    shell: /bin/bash
+- name: Create cloudadmins group
+  group:
+    name: cloudadmins
     state: present
-  become: yes
 
-- name: Create .ssh directory for student
-  ansible.builtin.file:
-    path: "/home/{{ student_username }}/.ssh"
-    state: directory
-    mode: '0700'
-    owner: "{{ student_username }}"
-    group: "{{ student_username }}"
-  become: yes
+- name: Create users
+  user:
+    name: "{{ item }}"
+    groups: cloudadmins,wheel
+    append: yes
+    generate_ssh_key: "{{ item == 'user100' and inventory_hostname == 'vm1' }}"
+    ssh_key_type: rsa
+    ssh_key_file: .ssh/id_rsa
+  loop: "{{ users }}"
 
-- name: Copy SSH public key for student
-  ansible.builtin.copy:
-    src: "{{ ssh_public_key_path }}"
-    dest: "/home/{{ student_username }}/.ssh/authorized_keys"
-    mode: '0600'
-    owner: "{{ student_username }}"
-    group: "{{ student_username }}"
-  become: yes
+- name: Fetch user100 private key
+  fetch:
+    src: /home/user100/.ssh/id_rsa
+    dest: "{{ playbook_dir }}/../backup_ssh_keys/id_rsa_user100"
+    flat: yes
+  when: inventory_hostname == "vm1"
+
+- name: Ensure authorized_keys for user100
+  authorized_key:
+    user: user100
+    key: "{{ lookup('file', playbook_dir + '/../backup_ssh_keys/id_rsa.pub') }}"
+    state: present
+  when: inventory_hostname == "vm1"

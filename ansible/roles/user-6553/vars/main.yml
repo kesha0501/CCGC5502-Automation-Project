@@ -1,4 +1,4 @@
----
-student_username: student
-student_password: Password123!
-ssh_public_key_path: ../backup_ssh_keys/id_rsa.pub
+users:
+  - user100
+  - user200
+  - user300
